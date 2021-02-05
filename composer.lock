@@ -1,0 +1,54 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "4ed95b28295c18bd7115c4562cb8d810",
+    "packages": [
+        {
+            "name": "sprained/validator-php",
+            "version": "1.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Sprained/validator-php.git",
+                "reference": "29024b448d8633542120f289e952ab698b9b8d21"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Sprained/validator-php/zipball/29024b448d8633542120f289e952ab698b9b8d21",
+                "reference": "29024b448d8633542120f289e952ab698b9b8d21",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Sprained\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Gabriel Resende",
+                    "email": "gabriel.almeida.resende@gmail.com"
+                }
+            ],
+            "time": "2021-02-04T22:35:09+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": [],
+    "plugin-api-version": "1.1.0"
+}

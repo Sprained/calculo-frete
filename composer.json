@@ -1,0 +1,17 @@
+{
+    "name": "sprained/calculo-frete",
+    "authors": [
+        {
+            "name": "Gabriel Resende",
+            "email": "gabriel.almeida.resende@gmail.com"
+        }
+    ],
+    "require": {
+        "sprained/validator-php": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Sprained\\": "src"
+        }
+    }
+}
