@@ -40,7 +40,11 @@ class Frete implements FreteInterface
      */
     protected $items = [];
 
-    public function item($largura, $altura, $comprimento, $peso, $quantidade = 1) {
+    //array serviços a serem tratados
+    protected $servicos = [];
+
+    public function item($largura, $altura, $comprimento, $peso, $quantidade = 1)
+    {
         $this->items[] = compact('largura', 'altura', 'comprimento', 'peso', 'quantidade');
 
         return $this;
@@ -48,7 +52,7 @@ class Frete implements FreteInterface
 
     public function items($items = [])
     {
-        foreach($items as $value) {
+        foreach ($items as $value) {
             $this->item($value[0], $value[1], $value[2], $value[3], isset($value[4]) ? $value[4] : 1);
         }
 
@@ -62,7 +66,7 @@ class Frete implements FreteInterface
      */
     public function largura()
     {
-        return max(array_map(function($item) {
+        return max(array_map(function ($item) {
             return $item['largura'];
         }, $this->items));
     }
@@ -74,7 +78,7 @@ class Frete implements FreteInterface
      */
     public function comprimento()
     {
-        return max(array_map(function($item) {
+        return max(array_map(function ($item) {
             return $item['comprimento'];
         }, $this->items));
     }
@@ -86,7 +90,7 @@ class Frete implements FreteInterface
      */
     public function altura()
     {
-        return array_sum(array_map(function($item) {
+        return array_sum(array_map(function ($item) {
             return $item['altura'] * $item['quantidade'];
         }, $this->items));
     }
@@ -98,7 +102,7 @@ class Frete implements FreteInterface
      */
     public function peso()
     {
-        return array_sum(array_map(function($item) {
+        return array_sum(array_map(function ($item) {
             return $item['peso'] * $item['quantidade'];
         }, $this->items));
     }
@@ -108,22 +112,23 @@ class Frete implements FreteInterface
      * 
      * @return array
      */
-    public function playload()
+    public function playload($servico)
     {
-        if($this->items) {
+        $this->playload['nCdServico'] = $servico;
+        if ($this->items) {
             $this->playload['nVlPeso'] = $this->volumeOrPeso();
             $this->playload['nVlComprimento'] = $this->comprimento();
             $this->playload['nVlAltura'] = $this->altura();
             $this->playload['nVlLargura'] = $this->largura();
             $this->playload['nVlDiametro'] = 0;
         }
-        
+
         return array_merge($this->playloadPadrao, $this->playload);
     }
 
     public function servico(...$servico)
     {
-        $this->playload['nCdServico'] = implode(',', array_unique($servico));
+        $this->servicos = array_unique($servico);
 
         return $this;
     }
@@ -190,7 +195,7 @@ class Frete implements FreteInterface
      */
     public function volumeOrPeso()
     {
-        if($this->volume() < 10 || $this->volume() <= $this->peso()) {
+        if ($this->volume() < 10 || $this->volume() <= $this->peso()) {
             return $this->peso();
         }
         return $this->volume();
@@ -198,26 +203,30 @@ class Frete implements FreteInterface
 
     public function calculo()
     {
-        $correios = WebService::CALC . '?' . http_build_query($this->playload());
-        
-        $ch = curl_init(); //INICIA CONEXÃO
-        curl_setopt($ch, CURLOPT_URL, $correios); //LIGAÇÃO COM URL
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // HABILITA RESPONSE
-        $response = curl_exec($ch);
-        
-        $xml = json_decode(json_encode(simplexml_load_string($response)));
-        $json = $xml->Servicos->cServico;
+        $responses = array_map(function ($servico) {
+            $correios = WebService::CALC . '?' . http_build_query($this->playload($servico));
 
-        $arr = [];
-        if($json->Erro == '0') {
-            $arr['codigo'] = $json->Codigo[0];
-            $arr['valor'] = $json->Valor;
-            $arr['prazo'] = $json->PrazoEntrega . ' Dias';
-            return $arr;
-        } else {
-            $arr['code'] = $json->Erro;
-            $arr['messagge'] = $json->MsgErro;
-            return $arr;
-        }
+            $ch = curl_init(); //INICIA CONEXÃO
+            curl_setopt($ch, CURLOPT_URL, $correios); //LIGAÇÃO COM URL
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // HABILITA RESPONSE
+            $response = curl_exec($ch);
+
+            $xml = json_decode(json_encode(simplexml_load_string($response)));
+            $json = $xml->Servicos->cServico;
+
+            $arr = [];
+            if ($json->Erro == '0') {
+                $arr['codigo'] = $json->Codigo[0];
+                $arr['valor'] = $json->Valor;
+                $arr['prazo'] = $json->PrazoEntrega . ' Dias';
+                return $arr;
+            } else {
+                $arr['code'] = $json->Erro;
+                $arr['messagge'] = $json->MsgErro;
+                return $arr;
+            }
+        }, $this->servicos);
+
+        return $responses;
     }
 }

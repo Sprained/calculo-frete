@@ -8,7 +8,7 @@ class Cep {
     public function cep($cep)
     {
         $validator = new Validator();
-        $cep = $validator->count(8, 8, 'Cep', trim($cep));
+        $cep = $validator->cep($cep);
 
         $ch = curl_init(); // INICIA CONEXÃO
         curl_setopt($ch, CURLOPT_URL, "https://viacep.com.br/ws/$cep/json/"); // LIGAÇÃO COM O LINK
@@ -22,9 +22,9 @@ class Cep {
         $json = json_decode($response);
 
         if(isset($json->erro)){
-            header("HTTP/1.0 400 Bad Request");
-            echo "CEP Inválido!";
-            die();
+            http_response_code(400);
+            echo json_encode(['message' => 'CEP Inválido!']);
+            die;
         }
 
         return $json;

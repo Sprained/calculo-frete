@@ -13,5 +13,12 @@
         "psr-4": {
             "Sprained\\": "src"
         }
+    },
+    "license": "MIT",
+    "scripts": {
+        "test": "phpunit --colors=always"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5"
     }
 }
