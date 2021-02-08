@@ -3,7 +3,7 @@
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Total Downloads][ico-downloads]][link-downloads]
 
-Biblioteca para a realização de calculo de frete junto a api do correios e consulta de cep.
+Biblioteca para a facilitação do cálculo de preços e prazos de entregas, usando a API disponibilizada pelos Correios. E realização de consultas de endereços por CEP, através do VIACEP.
 
 ## Funcionalidades
 
@@ -15,7 +15,7 @@ Biblioteca para a realização de calculo de frete junto a api do correios e con
 Via Composer
 
 ``` bash
-$ composer require sprained/validator-php
+$ composer require sprained/calculo-frete
 ```
 
 ## Uso
@@ -56,7 +56,7 @@ stdClass Object
 
 ### Calculo frete
 
-Calcula valor e tempo de envio junto com a API do Correios.
+Calcula o prazo e preço da entrega por meio da API disponibilizada pelos Correio.
 
 ``` php
 require 'vendor/autoload.php';
@@ -67,8 +67,8 @@ use Sprained\Correios\Service;
 $frete = new Frete();
 
 /*
-    Array de itens para calculo do frete
-    Parametros em ordem:
+    Array de itens para cálculo do frete
+    Parâmetros em ordem:
     largura, altura, comprimento, peso, quantidade (caso conter mais de um item)
 */
 $items = [
@@ -77,28 +77,28 @@ $items = [
 ];
 
 /*
-    Calculo frete e prazo para entrega
+    Cálculo frete e prazo para entrega
 
-    Obrigatorio
+    Campos Obrigatórios
     origem: cep de origem da encomenda
     destino: cep de destino para entrega da encomenda
     items: array de itens a enviar
     servico: tipo do serviço utilizado para entrega dos itens
-    calculo: faz o calculo e retorna o valor
+    calculo: faz o cálculo e retorna o valor
 
-    Não obrigatorio
+    Campos Não Obrigatórios
     pacote: informa tipo de pacote (caixa, prisma, envelope), por padrão se encontra em caixa
-    entregaEmMaos: informa que incomenda sera entregue com serviço mão propria
-    valorDeclarado: informa que incomenda sera entregue com serviço valor declarado
-    credenciais: Codigo administrativo junto à ECT, disponivel no corpo do do contrato do Correios 
+    entregaEmMaos: informa que a encomenda será entregue com serviço mão propria
+    valorDeclarado: informa que encomenda será entregue com serviço valor declarado
+    credenciais: código administrativo junto à ECT, disponivel no corpo do contrato do Correios 
 
-    Serviços de entrega
+    Serviços de Entregas
     Service::PAC
     Service::SEDEX
     Service::SEDEX_10
     Service::SEDEX_12
     Service::SEDEX_HOJE
-    Para serviços de entrega adicional passar numeração do serviço informado no contrato com correios
+    Para serviços de entregas adicionais, passar numeração do serviço informado no contrato com correios
 */
 $retorno = $frete->origem('51021020')
                 ->destino('50060230')
@@ -122,7 +122,6 @@ Array
             [valor] => 151,70
             [prazo] => 5 Dias
         )
-
 )
 */
 ```
@@ -132,10 +131,10 @@ Array
 - [Gabriel Resende][link-author]
 - [Vitoria Camila][link-vickie]
 
-[ico-version]: https://img.shields.io/packagist/v/sprained/validator-php.svg?style=flat-square
-[ico-downloads]: https://img.shields.io/packagist/dt/sprained/validator-php.svg?style=flat-square
+[ico-version]: https://img.shields.io/packagist/v/sprained/calculo-frete.svg?style=flat-square
+[ico-downloads]: https://img.shields.io/packagist/dt/sprained/calculo-frete.svg?style=flat-square
 
-[link-packagist]: https://packagist.org/packages/sprained/validator-php
-[link-downloads]: https://packagist.org/packages/sprained/validator-php
+[link-packagist]: https://packagist.org/packages/sprained/calculo-frete
+[link-downloads]: https://packagist.org/packages/sprained/calculo-frete
 [link-author]: https://github.com/sprained
 [link-vickie]: https://github.com/itsvickie
