@@ -2,8 +2,10 @@
 
 namespace Sprained\Correios;
 
+use SimpleXMLElement;
 use Sprained\Validator;
 use Sprained\Correios\Constants\Pacote;
+use Sprained\Correios\Constants\WebService;
 use Sprained\Correios\Interfaces\FreteInterface;
 
 class Frete implements FreteInterface
@@ -109,37 +111,23 @@ class Frete implements FreteInterface
     public function playload()
     {
         if($this->items) {
-            $this->playload['nVlPeso'] = $this->peso;
-            $this->playload['nVlComprimento'] = $this->comprimento;
-            $this->playload['nVlAltura'] = $this->alturo;
-            $this->playload['nVlLargura'] = $this->largura;
+            $this->playload['nVlPeso'] = $this->volumeOrPeso();
+            $this->playload['nVlComprimento'] = $this->comprimento();
+            $this->playload['nVlAltura'] = $this->altura();
+            $this->playload['nVlLargura'] = $this->largura();
             $this->playload['nVlDiametro'] = 0;
         }
         
         return array_merge($this->playloadPadrao, $this->playload);
     }
 
-    /**
-     * Serviços correio como Sedex, Pac
-     * 
-     * @param string $servico
-     * 
-     * @return self
-     */
-    public function servico($servico)
+    public function servico(...$servico)
     {
-        $this->playload['nCdServico'] = $servico;
+        $this->playload['nCdServico'] = implode(',', array_unique($servico));
 
         return $this;
     }
 
-    /**
-     * CEP de origem
-     * 
-     * @param string $cep
-     * 
-     * @return self
-     */
     public function origem($cep)
     {
         $validator = new Validator();
@@ -149,13 +137,6 @@ class Frete implements FreteInterface
         return $this;
     }
 
-    /**
-     * CEP de destino
-     * 
-     * @param string $cep
-     * 
-     * @return self
-     */
     public function destino($cep)
     {
         $validator = new Validator();
@@ -165,5 +146,78 @@ class Frete implements FreteInterface
         return $this;
     }
 
-    
+    public function pacote($formato)
+    {
+        $this->playload['nCdFormato'] = $formato;
+
+        return $this;
+    }
+
+    public function entregaEmMaos($mao)
+    {
+        $playload['sCdMaoPropria'] = (bool) $mao ? 'S' : 'N';
+
+        return $this;
+    }
+
+    public function valorDeclarado($valor)
+    {
+        $this->playload['nVlValorDeclarado'] = floatval($valor);
+    }
+
+    public function credenciais($code, $password)
+    {
+        $this->playload['nCdEmpresa'] = $code;
+        $this->playload['sDsSenha'] = $password;
+
+        return $this;
+    }
+
+    /**
+     * Calcular volume do frete com base no comprimento, algura e largura dos itens
+     * 
+     * @return int|float
+     */
+    public function volume()
+    {
+        return ($this->comprimento() * $this->largura() * $this->altura()) / 6000;
+    }
+
+    /**
+     * Calcular qual valor (volume ou peso) deve ser utilizado no final
+     * 
+     * @return int|float
+     */
+    public function volumeOrPeso()
+    {
+        if($this->volume() < 10 || $this->volume() <= $this->peso()) {
+            return $this->peso();
+        }
+        return $this->volume();
+    }
+
+    public function calculo()
+    {
+        $correios = WebService::CALC . '?' . http_build_query($this->playload());
+        
+        $ch = curl_init(); //INICIA CONEXÃO
+        curl_setopt($ch, CURLOPT_URL, $correios); //LIGAÇÃO COM URL
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // HABILITA RESPONSE
+        $response = curl_exec($ch);
+        
+        $xml = json_decode(json_encode(simplexml_load_string($response)));
+        $json = $xml->Servicos->cServico;
+
+        $arr = [];
+        if($json->Erro == '0') {
+            $arr['codigo'] = $json->Codigo[0];
+            $arr['valor'] = $json->Valor;
+            $arr['prazo'] = $json->PrazoEntrega . ' Dias';
+            return $arr;
+        } else {
+            $arr['code'] = $json->Erro;
+            $arr['messagge'] = $json->MsgErro;
+            return $arr;
+        }
+    }
 }
