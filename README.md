@@ -9,6 +9,7 @@ Biblioteca para a facilitação do cálculo de preços e prazos de entregas, usa
 
 - [CEP](#consulta-pelo-cep)
 - [Frete](#calculo-frete)
+- [Rastreio de encomenda](#rastreio-de-encomenda)
 
 ## Instalação
 
@@ -123,6 +124,65 @@ Array
             [prazo] => 5 Dias
         )
 )
+*/
+```
+
+### Rastreio de encomenda
+
+Rastreia a encomenda retornando as informações de rastreio.
+
+``` php
+require 'vendor/autoload.php';
+
+use Sprained\Correios\Tracking;
+use Sprained\Correios\Exceptions\TrackingException;
+
+try {
+    $track = new Tracking();
+
+    print_r($track->tracking('LB208326091SG'));
+} catch(TrackingException $e) {
+    http_response_code($e->getCode());
+    echo $e->getMessage();
+}
+
+/*
+{
+    "code": "LB208326091SG",
+    "last_status": "Objeto em trânsito - por favor aguarde",
+    "last_date": "03/02/2021 14:49",
+    "last_locale": "CTCE FORTALEZA - Fortaleza / CE",
+    "tracking": [
+        {
+        "status": "Objeto em trânsito - por favor aguarde",
+        "date": "03/02/2021 14:49",
+        "local": "CTCE FORTALEZA - Fortaleza / CE",
+        "destino": "CTE RECIFE - Recife / PE"
+        },
+        {
+        "status": "Objeto em trânsito - por favor aguarde",
+        "date": "29/01/2021 14:26",
+        "local": "UNIDADE INTERNACIONAL CURITIBA - Curitiba / PR",
+        "destino": "CTE CAJAMAR - Cajamar / SP"
+        },
+        {
+        "status": "Fiscalização aduaneira finalizada",
+        "date": "29/01/2021 14:24",
+        "local": "UNIDADE INTERNACIONAL CURITIBA - Curitiba / PR"
+        },
+        {
+        "status": "Objeto recebido pelos Correios do Brasil",
+        "date": "29/01/2021 10:44",
+        "local": "UNIDADE INTERNACIONAL CURITIBA - Curitiba / PR"
+        },
+        {
+        "status": "Objeto em trânsito - por favor aguarde",
+        "date": "09/01/2021 11:47",
+        "local": "CINGAPURA -  /",
+        "destino": "Unidade de Tratamento Internacional -  / BR"
+        }
+    ]
+}
 */
 ```
 
