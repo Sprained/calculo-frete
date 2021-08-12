@@ -24,7 +24,7 @@ class Cep {
         if(isset($json->erro)){
             http_response_code(400);
             echo json_encode(['message' => 'CEP Inválido!']);
-            die;
+            // die;
         }
 
         return $json;

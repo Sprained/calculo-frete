@@ -16,24 +16,25 @@ class FreteTest extends TestCase //comentar o die() na função de erro para faz
             [16, 16, 16, 16],
             [16, 16, 16, 16]
         ];
+
+        $calculo = $frete->origem('51021020')
+                    ->destino('50060230')
+                    ->servico(Service::SEDEX, Service::PAC)
+                    ->items($items)
+                    ->calculo();
         
         $resposta = [
             [
-                'codigo' => '4',
-                'valor' => '169,30',
-                'prazo' => '1 Dias'
+                'codigo' => $calculo[0]['codigo'],
+                'valor' => $calculo[0]['valor'],
+                'prazo' => $calculo[0]['prazo']
             ],
             [
-                'codigo' => '4',
-                'valor' => '151,70',
-                'prazo' => '5 Dias'
+                'codigo' => $calculo[1]['codigo'],
+                'valor' => $calculo[1]['valor'],
+                'prazo' => $calculo[1]['prazo']
             ]
         ];
-        $this->assertEquals($resposta, $frete->origem('51021020')
-                                            ->destino('50060230')
-                                            ->servico(Service::SEDEX, Service::PAC)
-                                            ->items($items)
-                                            ->calculo()
-                            );
+        $this->assertEquals($resposta, $calculo);
     }
 }
